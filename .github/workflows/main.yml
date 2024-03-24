@@ -1,0 +1,62 @@
+name: Deploy SvelteKit App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOMAIN: 'pleasefix.me'
+  NODE_VERSION: '21.7.1'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Prepare Build for Deployment
+        run: |
+          cp package.json ./build/
+          cp yarn.lock ./build/
+          tar -czvf build.tar.gz -C ./build .
+
+      - name: Generate Timestamp
+        id: get_timestamp
+        run: echo "::set-output name=timestamp::$(date +%Y%m%d%H%M%S)"
+
+      - name: Copy Build to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'build.tar.gz'
+          target: '/var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }}'
+
+      - name: Unpack Build on Server and Reload App
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }}
+            tar -xvzf build.tar.gz
+            yarn install --production
+            ln -sfn /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }} /var/www/${{env.DOMAIN}}/current
+            pm2 reload ${{env.DOMAIN}}
