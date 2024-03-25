@@ -43,7 +43,6 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
           source: 'build.tar.gz'
           target: '/var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }}'
 
@@ -53,10 +52,19 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }}
             tar -xvzf build.tar.gz
             yarn install --production
             ln -sfn /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }} /var/www/${{env.DOMAIN}}/current
             pm2 reload ${{env.DOMAIN}}
+
+      - name: Execute Cleanup Script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/${{env.DOMAIN}}
+            ./cleanup.sh
