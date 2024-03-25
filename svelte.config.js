@@ -7,7 +7,10 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 
-	kit: { adapter: adapter() }
+	kit: {
+		adapter: adapter(),
+		csrf: { checkOrigin: false } // to enable google oauth
+	}
 };
 
 export default config;
