@@ -3,7 +3,7 @@
 	import { writable } from 'svelte/store';
 	import { loadConfig } from '$lib/config';
 	import Button from '$lib/components/Button.svelte';
-	import GoogleIcon from '$lib/icons/google.svelte';
+	import GoogleIcon from '$lib/components/icons/google.svelte';
 
 	let container: HTMLDivElement;
 	let googleBtn: HTMLDivElement;
