@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { db } from '$lib/db';
+import { db } from '$lib/infrastructure/db';
 import { Provider } from '$lib/domain/models.js';
 import { validateGoogleIdTokenRequest } from '$lib/infrastructure/auth/google.js';
 import { logger } from '$lib/infrastructure/logger.js';
