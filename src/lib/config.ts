@@ -29,6 +29,14 @@ const getConfigForEnv = () => {
 export const loadConfig = async () => {
 	const base = getConfigForEnv();
 
+	/**
+	 * This is a bit of a dirty hack to get the environment variables in the server side.
+	 * When accessing this file from the client importing $env/dynamic/private would throw an error.
+	 * Therfore it has to be dynamically imported only when the config is accessed by code running on the server side.
+	 *
+	 * I also tried to simply split the config into two files, one for the client and one for the server, but that would
+	 * "force" the importing file to know whether it runs on the server on not. This way the importing file has one interface.
+	 */
 	if (import.meta.env.SSR && typeof window === 'undefined') {
 		const { env } = await import('$env/dynamic/private');
 		base.sessionEnryptionKey = env.SESSION_ENCRYPTION_KEY || '';
