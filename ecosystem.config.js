@@ -5,8 +5,8 @@ module.exports = {
 			script: './index.js',
 			env_production: {
 				NODE_ENV: 'production',
-				VITE_GOOGLE_OAUTH_CLIENT_SECRET: process.env.VITE_GOOGLE_OAUTH_CLIENT_SECRET,
-				VITE_SESSION_ENCRYPTION_KEY: process.env.VITE_SESSION_ENCRYPTION_KEY,
+				GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+				SESSION_ENCRYPTION_KEY: process.env.SESSION_ENCRYPTION_KEY,
 				DATABASE_URL: process.env.DATABASE_URL
 			}
 		}

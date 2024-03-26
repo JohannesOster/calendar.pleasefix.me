@@ -1,6 +1,6 @@
-import { config } from '$lib/config';
+import { loadConfig } from '$lib/config';
 
-const rawKey = Buffer.from(config.sessionEnryptionKey, 'base64');
+const rawKey = Buffer.from((await loadConfig()).sessionEnryptionKey, 'base64');
 
 export const encrypt = async (data: any) => {
 	const encoder = new TextEncoder();

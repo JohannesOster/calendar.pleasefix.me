@@ -1,12 +1,14 @@
 import { google } from 'googleapis';
-import { config } from '$lib/config';
+import { loadConfig } from '$lib/config';
 import { error, type Cookies } from '@sveltejs/kit';
+
+const { google: googleConfig } = await loadConfig();
 
 const getGoogleOAuth2Client = () => {
 	return new google.auth.OAuth2(
-		config.google.clientID,
-		config.google.clientSecret,
-		config.google.authCallbackURL
+		googleConfig.clientID,
+		googleConfig.clientSecret,
+		googleConfig.authCallbackURL
 	);
 };
 
@@ -33,7 +35,7 @@ export const validateGoogleIdTokenRequest = async ({
 
 	const ticket = await getGoogleOAuth2Client().verifyIdToken({
 		idToken: idToken,
-		audience: config.google.clientID
+		audience: googleConfig.clientID
 	});
 
 	const googleSub = ticket.getUserId();

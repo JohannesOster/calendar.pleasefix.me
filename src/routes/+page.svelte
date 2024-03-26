@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { config } from '$lib/config';
+	import { loadConfig } from '$lib/config';
 	import Button from '$lib/components/Button.svelte';
 	import GoogleIcon from '$lib/icons/google.svelte';
 
@@ -17,16 +17,17 @@
 	};
 
 	onMount(() => {
-		didLoad.subscribe((loaded) => loaded && renderHiddenGoogleAuthBtn());
+		didLoad.subscribe(async (loaded) => loaded && (await renderHiddenGoogleAuthBtn()));
 		ingestGSIScript();
 	});
 
-	const renderHiddenGoogleAuthBtn = () => {
+	const renderHiddenGoogleAuthBtn = async () => {
 		// https://stackoverflow.com/questions/70993933/why-does-the-sign-in-with-google-button-disappear-after-i-render-it-the-second-t
 		if (window.google && container) {
+			const _config = await loadConfig();
 			window.google.accounts.id.initialize({
-				client_id: config.google.clientID,
-				login_uri: config.google.authCallbackURL,
+				client_id: _config.google.clientID,
+				login_uri: _config.google.authCallbackURL,
 				ux_mode: 'redirect',
 				context: 'signup'
 			});
