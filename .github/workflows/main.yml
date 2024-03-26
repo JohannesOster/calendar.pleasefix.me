@@ -72,7 +72,7 @@ jobs:
             npx prisma migrate deploy
 
             # Reload PM2 process
-            pm2 reload ecosystem.config.js --env production --update-env
+            pm2 reload ../ecosystem.config.js --env production --update-env
 
             # Cleanup temporary .env file
             rm .env.production
