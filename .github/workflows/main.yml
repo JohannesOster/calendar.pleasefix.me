@@ -53,11 +53,29 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Unpack build
             cd /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }}
             tar -xvzf build.tar.gz
+
+            # Prepare for production
             yarn install --production
+
+            # Link current to new build
             ln -sfn /var/www/${{env.DOMAIN}}/${{ steps.get_timestamp.outputs.timestamp }} /var/www/${{env.DOMAIN}}/current
-            pm2 reload ${{env.DOMAIN}}
+
+            # Generate a temporary .env file for PM2 to use
+            echo "VITE_GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.VITE_GOOGLE_OAUTH_CLIENT_SECRET }}" > .env.production
+            echo "VITE_SESSION_ENCRYPTION_KEY=${{ secrets.VITE_SESSION_ENCRYPTION_KEY }}" >> .env.production
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.production
+
+            # Update Prisma Schema
+            npx prisma migrate deploy
+
+            # Reload PM2 process
+            pm2 reload ecosystem.config.js --env production --update-env
+
+            # Cleanup temporary .env file
+            rm .env.production
 
       - name: Execute Cleanup Script
         uses: appleboy/ssh-action@master
