@@ -3,7 +3,7 @@ const _config = {
 		google: {
 			clientID: '814682511130-he9mlhc4f1pprkkm4th426fto2o7fc32.apps.googleusercontent.com',
 			clientSecret: '',
-			authCallbackURL: 'http://localhost:5173/api/auth/login/callback'
+			authCallbackURL: 'http://localhost:5173/api/auth/google/callback'
 		},
 		sessionEnryptionKey: '',
 		baseURL: 'http://localhost:5173'
@@ -12,7 +12,7 @@ const _config = {
 		google: {
 			clientID: '814682511130-he9mlhc4f1pprkkm4th426fto2o7fc32.apps.googleusercontent.com',
 			clientSecret: '',
-			authCallbackURL: 'https://pleasefix.me/api/auth/login/callback'
+			authCallbackURL: 'https://pleasefix.me/api/auth/google/callback'
 		},
 		sessionEnryptionKey: '',
 		baseURL: 'http://pleasefix.me'
