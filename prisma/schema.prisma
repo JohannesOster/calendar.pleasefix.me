@@ -22,6 +22,8 @@ model Account {
   provider         String
   refreshToken     String?
   syncChannels     SyncChannel[]
+  syncRuleAsSource SyncRule[]    @relation("sourceAccount")
+  syncRuleAsTarget SyncRule[]    @relation("targetAccount")
 }
 
 model SyncChannel {
@@ -32,4 +34,14 @@ model SyncChannel {
   nextSyncToken String?
   resourceId    String?
   expiration    DateTime?
+}
+
+model SyncRule {
+  id               String       @id @default(uuid())
+  sourceAccount    Account      @relation(name: "sourceAccount", fields: [sourceAccountId], references: [id], onDelete: Cascade)
+  sourceAccountId  String
+  sourceCalendarId String
+  targetAccount    Account      @relation(name: "targetAccount", fields: [targetAccountId], references: [id], onDelete: Cascade)
+  targetAccountId  String
+  targetCalendarId String
 }
