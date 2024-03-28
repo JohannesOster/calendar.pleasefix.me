@@ -1,23 +1,20 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
-	export let as: keyof HTMLElementTagNameMap = 'button';
 	export let href: string | undefined = undefined;
-
-	let element: HTMLElement;
-
-	onMount(() => {
-		if (as === 'a') if (href) element.setAttribute('href', href);
-	});
+	export let type: string | undefined = 'button';
 </script>
 
 <svelte:element
-	this={as}
-	bind:this={element}
+	this={href ? 'a' : 'button'}
+	type={href ? undefined : type}
+	{href}
 	on:click
-	type="button"
-	role="button"
+	on:change
+	on:keydown
+	on:keyup
+	on:mouseenter
+	on:mouseleave
 	tabindex="0"
+	role="button"
 	class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 inline-flex items-center gap-x-1.5"
 >
 	<slot />

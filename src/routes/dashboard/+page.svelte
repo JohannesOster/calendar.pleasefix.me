@@ -9,7 +9,7 @@
 	<div class="flex w-full justify-between">
 		<h1 class="text-xl">Calendar Accounts</h1>
 		<div>
-			<Button as={'a'} href={data.googleAuthorizationURL}>
+			<Button href={data.googleAuthorizationURL}>
 				<GoogleIcon /> Connect Google Account
 			</Button>
 		</div>
