@@ -21,4 +21,15 @@ model Account {
   userId           String
   provider         String
   refreshToken     String?
+  syncChannels     SyncChannel[]
+}
+
+model SyncChannel {
+  id            String    @id @default(uuid())
+  account       Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId     String
+  calendarId    String
+  nextSyncToken String?
+  resourceId    String?
+  expiration    DateTime?
 }

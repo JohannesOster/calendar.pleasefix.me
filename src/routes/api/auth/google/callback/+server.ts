@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { db } from '$lib/infrastructure/db';
-import { Provider } from '$lib/domain/models.js';
+import { Provider } from '$lib/domain/types.js';
 import {
 	exchangeGoogleAuthToken,
 	validateGoogleIdTokenRequest
