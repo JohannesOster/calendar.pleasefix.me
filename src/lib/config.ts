@@ -5,7 +5,8 @@ const _config = {
 			clientSecret: '',
 			authCallbackURL: 'http://localhost:5173/api/auth/login/callback'
 		},
-		sessionEnryptionKey: ''
+		sessionEnryptionKey: '',
+		baseURL: 'http://localhost:5173'
 	},
 	production: {
 		google: {
@@ -13,8 +14,14 @@ const _config = {
 			clientSecret: '',
 			authCallbackURL: 'https://pleasefix.me/api/auth/login/callback'
 		},
-		sessionEnryptionKey: ''
+		sessionEnryptionKey: '',
+		baseURL: 'http://pleasefix.me'
 	}
+};
+
+export const setBaseURL = (url: string) => {
+	if (!import.meta.env.DEV) throw Error('Cannot set base URL in production');
+	_config.development.baseURL = url;
 };
 
 const getEnv = () => {
