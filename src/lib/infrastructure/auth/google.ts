@@ -4,7 +4,7 @@ import { error, type Cookies } from '@sveltejs/kit';
 
 const { google: googleConfig } = await loadConfig();
 
-const getGoogleOAuth2Client = () => {
+export const getGoogleOAuth2Client = () => {
 	return new google.auth.OAuth2(
 		googleConfig.clientID,
 		googleConfig.clientSecret,

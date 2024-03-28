@@ -1,6 +1,10 @@
 import { error } from '@sveltejs/kit';
+import { google } from 'googleapis';
+import { type OAuth2Client } from 'google-auth-library';
+import type { Account } from '@prisma/client';
 import { logger } from '../logger';
 import { db } from '../db';
+import { getGoogleOAuth2Client } from './google';
 
 type AttachAcountPayload = { accountId: string; refreshToken: string | null | undefined };
 export const attachAccountToUser = async (
@@ -29,4 +33,37 @@ export const attachAccountToUser = async (
 			data: { id: accountId, userId, provider: 'google', refreshToken }
 		});
 	}
+};
+
+export const getAuthForAccount = async (account: Account) => {
+	if (account.provider === 'google') {
+		if (!account.refreshToken) error(400, 'Missing refresh token');
+		const googleOAuth2Client = getGoogleOAuth2Client();
+		googleOAuth2Client.setCredentials({ refresh_token: account.refreshToken });
+		return googleOAuth2Client;
+	}
+	error(500, `Unsupported Provider: ${account.provider}`);
+};
+
+export const retrieveEmailForAccount = async (account: Account) => {
+	const auth = await getAuthForAccount(account);
+	if (account.provider === 'google') {
+		const { data } = await google.oauth2('v2').userinfo.get({ auth: auth as OAuth2Client });
+		if (!data.email) return error(500, "Couldn't fetch e-mail from google");
+		return data.email;
+	}
+	error(500, `Unsupported Provider: ${account.provider}`);
+};
+
+export const listConnectedAccounts = async (userId: string) => {
+	const connectedAccountsRaw = await db.account.findMany({
+		where: { AND: [{ userId: { equals: userId } }, { refreshToken: { not: null } }] }
+	});
+
+	const promises = connectedAccountsRaw.map(async (account) => {
+		const email = await retrieveEmailForAccount(account);
+		return { ...account, email };
+	});
+
+	return Promise.all(promises);
 };

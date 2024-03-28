@@ -1,6 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { SessionCookiePayload } from '$lib/infrastructure/auth/session';
+import type { Session } from '$lib/infrastructure/auth/session';
 
 // for information about these interfaces
 declare global {
@@ -8,7 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			traceId: string;
-			session?: SessionCookiePayload;
+			session?: Session;
 		}
 		// interface PageData {}
 		// interface PageState {}
