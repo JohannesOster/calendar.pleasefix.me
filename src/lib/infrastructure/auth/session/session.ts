@@ -1,4 +1,4 @@
-import { db } from '$lib/db';
+import { db } from '$lib/infrastructure/db';
 import { randomStr } from '$lib/utils';
 import { decrypt, encrypt } from './encryption';
 import { error, type Cookies } from '@sveltejs/kit';

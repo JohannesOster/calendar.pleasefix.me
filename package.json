@@ -19,6 +19,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.0",
 		"@types/google.accounts": "^0.0.14",
+		"@types/localtunnel": "^2.0.4",
 		"@types/node": "^20.11.30",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",
 		"@typescript-eslint/parser": "^7.0.0",
@@ -42,6 +43,7 @@
 	"dependencies": {
 		"@prisma/client": "5.11.0",
 		"googleapis": "^133.0.0",
+		"localtunnel": "^2.0.2",
 		"pino": "^8.19.0"
 	}
 }

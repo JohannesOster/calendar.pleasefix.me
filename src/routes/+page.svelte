@@ -3,11 +3,14 @@
 	import { writable } from 'svelte/store';
 	import { loadConfig } from '$lib/config';
 	import Button from '$lib/components/Button.svelte';
-	import GoogleIcon from '$lib/icons/google.svelte';
+	import GoogleIcon from '$lib/components/icons/google.svelte';
+	import { goto } from '$app/navigation';
 
 	let container: HTMLDivElement;
 	let googleBtn: HTMLDivElement;
 	let didLoad = writable(false);
+
+	export let data;
 
 	const ingestGSIScript = () => {
 		const script = document.createElement('script');
@@ -17,8 +20,10 @@
 	};
 
 	onMount(() => {
-		didLoad.subscribe(async (loaded) => loaded && (await renderHiddenGoogleAuthBtn()));
-		ingestGSIScript();
+		if (!data.session) {
+			didLoad.subscribe(async (loaded) => loaded && (await renderHiddenGoogleAuthBtn()));
+			ingestGSIScript();
+		}
 	});
 
 	const renderHiddenGoogleAuthBtn = async () => {
@@ -46,6 +51,7 @@
 	};
 
 	const onClick = () => {
+		if (data.session) goto('/dashboard'); // skip authentication for authenticated users
 		return googleBtn?.click();
 	};
 </script>
