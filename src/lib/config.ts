@@ -17,7 +17,7 @@ const _config = {
 		},
 		redis: { host: 'localhost', port: 6379 },
 		sessionEnryptionKey: '',
-		baseURL: 'http://pleasefix.me'
+		baseURL: 'https://pleasefix.me'
 	}
 };
 
