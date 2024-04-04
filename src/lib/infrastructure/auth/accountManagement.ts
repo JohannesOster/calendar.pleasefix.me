@@ -48,7 +48,12 @@ export const getAuthForAccount = async (account: Account) => {
 export const retrieveEmailForAccount = async (account: Account) => {
 	const auth = await getAuthForAccount(account);
 	if (account.provider === 'google') {
-		const { data } = await google.oauth2('v2').userinfo.get({ auth: auth as OAuth2Client });
+		const { data } = await google
+			.oauth2('v2')
+			.userinfo.get({ auth: auth as OAuth2Client })
+			.catch(({ response }) => {
+				error(response.status, response.data);
+			});
 		if (!data.email) return error(500, "Couldn't fetch e-mail from google");
 		return data.email;
 	}
@@ -61,9 +66,16 @@ export const listConnectedAccounts = async (userId: string) => {
 	});
 
 	const promises = connectedAccountsRaw.map(async (account) => {
-		const email = await retrieveEmailForAccount(account);
-		return { ...account, email };
+		try {
+			const email = await retrieveEmailForAccount(account);
+			return { ...account, email };
+		} catch (err) {
+			logger().error({ message: 'Failed to retrieve email for account.', err });
+			return { ...account, email: null };
+		}
 	});
 
-	return Promise.all(promises);
+	return Promise.all(promises).then((accounts) =>
+		accounts.filter((account) => account.email != null)
+	) as Promise<(Account & { email: string })[]>;
 };
