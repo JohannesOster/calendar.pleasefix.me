@@ -6,7 +6,7 @@ import type {
 	Auth,
 	CalendarProvider,
 	CalendarSubscriptionRequest,
-	EventIdentifier
+	CalendarEventIdentifier
 } from '../types';
 import type { Calendar, CalendarEvent } from '$lib/domain/types';
 import { adapter } from './adapter';
@@ -106,7 +106,7 @@ const createCalendarEvent = async (details: Omit<CalendarEvent, 'eventId'>, auth
 	});
 };
 
-const retrieveCalendarEvent = async (query: EventIdentifier, auth: Auth) => {
+const retrieveCalendarEvent = async (query: CalendarEventIdentifier, auth: Auth) => {
 	if (!(auth instanceof OAuth2Client)) {
 		error(500, 'Incorrect auth object was passed. Google requires OAuth2Client');
 	}
@@ -144,7 +144,7 @@ const updateCalendarEvent = async (event: CalendarEvent, auth: Auth) => {
 	});
 };
 
-const deleteCalendarEvent = async (details: EventIdentifier, auth: Auth) => {
+const deleteCalendarEvent = async (details: CalendarEventIdentifier, auth: Auth) => {
 	if (!(auth instanceof OAuth2Client)) {
 		error(500, 'Incorrect auth object was passed. Google requires OAuth2Client');
 	}
