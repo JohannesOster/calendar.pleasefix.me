@@ -6,7 +6,8 @@ import { provider as googleProvider } from './google';
 import type {
 	CalendarProvider,
 	CalendarSubscriptionRequest,
-	CalendarEventIdentifier
+	CalendarEventIdentifier,
+	ListCalendarEventsQuery
 } from './types';
 import { error } from '@sveltejs/kit';
 
@@ -78,12 +79,20 @@ const deleteCalendarEvent = async (params: CalendarEventIdentifier & { accountId
 	return await provider.events.delete(params, auth);
 };
 
+const listCalendarEvents = async (query: ListCalendarEventsQuery) => {
+	const account = await getOrThrowAcount(query.accountId);
+	const auth = await getAuthForAccount(account);
+	const provider = getCalendarProvider(account.provider as Provider);
+	return provider.events.list(query, auth);
+};
+
 export const calendarProvider = {
 	calendars: {
 		list: listCalendars,
 		subscribe: subscribeCalendarChanges
 	},
 	events: {
+		list: listCalendarEvents,
 		create: createCalendarEvent,
 		update: updateCalendarEvent,
 		delete: deleteCalendarEvent,

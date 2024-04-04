@@ -1,5 +1,5 @@
 type ISO8601DateString = string; // ISO 8601 format: "2020-06-01T21:15:00.000Z"
-interface DateTime {
+export interface CalendarEventDateTime {
 	dateTime: ISO8601DateString;
 	tzId: string; // TimezoneIdentifier IANA Time Zone Database name: "Europe/Zurich"
 }
@@ -45,12 +45,15 @@ export interface CalendarEvent {
 	title?: string;
 	description?: string;
 
-	start: DateTime;
-	end: DateTime;
+	start?: CalendarEventDateTime;
+	end?: CalendarEventDateTime;
 
 	status: CalendarEventStatus;
 
 	location?: string;
 
 	conferenceData?: ConferenceData;
+
+	created?: ISO8601DateString;
+	updated?: ISO8601DateString;
 }
