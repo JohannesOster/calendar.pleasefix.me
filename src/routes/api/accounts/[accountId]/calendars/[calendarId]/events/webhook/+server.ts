@@ -1,4 +1,5 @@
 import { logger } from '$lib/infrastructure/logger.js';
+import { queue } from '$lib/infrastructure/queue';
 import { error, json } from '@sveltejs/kit';
 
 export async function POST({ request, url, locals }) {
@@ -21,7 +22,7 @@ export async function POST({ request, url, locals }) {
 			message: `Received notification on channel ${channelId}. Push task to queue...`
 		});
 
-		// TODO: handle notification
+		queue.add('googlePushNotification', { traceId, channelId });
 
 		return json({});
 	}
