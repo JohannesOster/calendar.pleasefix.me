@@ -6,7 +6,8 @@ import type {
 	Auth,
 	CalendarProvider,
 	CalendarSubscriptionRequest,
-	EventIdentifier
+	CalendarEventIdentifier,
+	ListCalendarEventsQuery
 } from '../types';
 import type { Calendar, CalendarEvent } from '$lib/domain/types';
 import { adapter } from './adapter';
@@ -15,6 +16,8 @@ import { getRFC3339Timestamp } from './utils';
 import { db } from '$lib/infrastructure/db';
 
 const api = google.calendar('v3');
+
+const DEFAULT_MAX_RESULTS = 200;
 
 // =============== Calendars
 const listCalendars = async (auth: Auth): Promise<Calendar[]> => {
@@ -106,7 +109,7 @@ const createCalendarEvent = async (details: Omit<CalendarEvent, 'eventId'>, auth
 	});
 };
 
-const retrieveCalendarEvent = async (query: EventIdentifier, auth: Auth) => {
+const retrieveCalendarEvent = async (query: CalendarEventIdentifier, auth: Auth) => {
 	if (!(auth instanceof OAuth2Client)) {
 		error(500, 'Incorrect auth object was passed. Google requires OAuth2Client');
 	}
@@ -144,7 +147,7 @@ const updateCalendarEvent = async (event: CalendarEvent, auth: Auth) => {
 	});
 };
 
-const deleteCalendarEvent = async (details: EventIdentifier, auth: Auth) => {
+const deleteCalendarEvent = async (details: CalendarEventIdentifier, auth: Auth) => {
 	if (!(auth instanceof OAuth2Client)) {
 		error(500, 'Incorrect auth object was passed. Google requires OAuth2Client');
 	}
@@ -156,12 +159,28 @@ const deleteCalendarEvent = async (details: EventIdentifier, auth: Auth) => {
 	});
 };
 
+const listCalendarEvents = async (query: ListCalendarEventsQuery, auth: Auth) => {
+	if (!(auth instanceof OAuth2Client)) {
+		error(500, 'Incorrect auth object was passed. Google requires OAuth2Client');
+	}
+
+	const { calendarId, accountId, syncToken, maxResults = DEFAULT_MAX_RESULTS } = query;
+	const { data } = await api.events.list({ calendarId, maxResults, syncToken, auth });
+	if (!data || !data.items) return { nextSyncToken: data.nextSyncToken || undefined, events: [] };
+
+	return {
+		nextSyncToken: data.nextSyncToken || undefined,
+		events: data.items.map((event) => adapter.events.fromProvider(event, { accountId, calendarId }))
+	};
+};
+
 export const provider: CalendarProvider = {
 	calendars: {
 		list: listCalendars,
 		subscribeToChanges: subscribeToCalendarChanges
 	},
 	events: {
+		list: listCalendarEvents,
 		create: createCalendarEvent,
 		retrieve: retrieveCalendarEvent,
 		update: updateCalendarEvent,

@@ -76,7 +76,7 @@ const validateFormSubmission = (data: FormData) => {
 const subscribeToCalendar = async (accountId: string, calendarId: string) => {
 	const account = await db.account.findFirst({ where: { id: accountId } });
 	if (!account) error(404, 'Account not found.');
-	const expiration = getExpirationDate(hoursToMilliseconds(0.5));
+	const expiration = getExpirationDate(hoursToMilliseconds(0.1));
 	await calendarProvider.calendars.subscribe({ accountId, calendarId, expiration });
 };
 

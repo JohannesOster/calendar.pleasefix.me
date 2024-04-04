@@ -5,6 +5,7 @@ import {
 	CalendarEventStatus,
 	type Calendar,
 	type CalendarEvent,
+	type CalendarEventDateTime,
 	type ConferenceData
 } from '$lib/domain/types';
 
@@ -67,8 +68,8 @@ function toGoogleEvent(event: any): GoogleEvent {
 		summary: _event.title,
 		description: _event.description,
 
-		start: { dateTime: _event.start.dateTime, timeZone: _event.start.tzId },
-		end: { dateTime: _event.end.dateTime, timeZone: _event.end.tzId },
+		start: { dateTime: _event.start?.dateTime, timeZone: _event.start?.tzId },
+		end: { dateTime: _event.end?.dateTime, timeZone: _event.end?.tzId },
 
 		status: _event.status,
 
@@ -108,18 +109,28 @@ const fromGoogleEvent = (
 
 	const status = (event.status as CalendarEventStatus) || CalendarEventStatus.unknown;
 
-	const startDateTimeRaw = assertValue(event.start?.dateTime, 'Missing event start dateTime');
+	let start: CalendarEventDateTime | undefined;
+	if (event.start?.dateTime) {
+		const startDateTimeObj = DateTime.fromISO(event.start.dateTime);
+		const startDateTime = assertValue(
+			startDateTimeObj.toISO(),
+			"Can't retrieve datetime for start"
+		);
+		const startTimeZone = assertValue(
+			startDateTimeObj.zoneName,
+			"Can't retrieve timezone for start"
+		);
 
-	const endDateTimeRaw = assertValue(event.end?.dateTime, 'Missing event end dateTime');
+		start = { dateTime: startDateTime, tzId: startTimeZone };
+	}
 
-	const startDateTimeObj = DateTime.fromISO(startDateTimeRaw);
-	const endDateTimeObj = DateTime.fromISO(endDateTimeRaw);
-
-	const startDateTime = assertValue(startDateTimeObj.toISO(), "Can't retrieve datetime for start");
-	const startTimeZone = assertValue(startDateTimeObj.zoneName, "Can't retrieve timezone for start");
-
-	const endDateTime = assertValue(endDateTimeObj.toISO(), "Can't retrieve datetime for end");
-	const endTimeZone = assertValue(endDateTimeObj.zoneName, "Can't retrieve timezone for end");
+	let end: CalendarEventDateTime | undefined;
+	if (event.end?.dateTime) {
+		const endDateTimeObj = DateTime.fromISO(event.end.dateTime);
+		const endDateTime = assertValue(endDateTimeObj.toISO(), "Can't retrieve datetime for end");
+		const endTimeZone = assertValue(endDateTimeObj.zoneName, "Can't retrieve timezone for end");
+		end = { dateTime: endDateTime, tzId: endTimeZone };
+	}
 
 	const location = event.location || undefined;
 
@@ -131,14 +142,17 @@ const fromGoogleEvent = (
 		title,
 		description,
 
-		start: { dateTime: startDateTime, tzId: startTimeZone },
-		end: { dateTime: endDateTime, tzId: endTimeZone },
+		start,
+		end,
 
 		status,
 
 		location,
 
-		conferenceData: event.conferenceData ? mapConferenceData(event.conferenceData) : undefined
+		conferenceData: event.conferenceData ? mapConferenceData(event.conferenceData) : undefined,
+
+		created: event.created || undefined,
+		updated: event.updated || undefined
 	};
 };
 

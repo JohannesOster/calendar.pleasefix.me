@@ -44,4 +44,14 @@ model SyncRule {
   targetAccount    Account      @relation(name: "targetAccount", fields: [targetAccountId], references: [id], onDelete: Cascade)
   targetAccountId  String
   targetCalendarId String
+  syncedItems      SyncedItem[]
+}
+
+model SyncedItem {
+  id            String     @id @default(uuid())
+  syncRule      SyncRule   @relation(fields: [syncRuleId], references: [id], onDelete: Cascade)
+  syncRuleId    String
+  sourceEventId String
+  targetEventId String
+  history       String
 }

@@ -1,21 +1,19 @@
+import type { Calendar, CalendarEvent, Provider } from '$lib/domain/types';
 import { getAuthForAccount } from '../auth/accountManagement';
 import { db } from '../db';
 import { logger } from '../logger';
-import { provider } from './google';
+import { provider as googleProvider } from './google';
 import type {
-	Calendar,
-	CalendarEvent,
-	RetrieveCalendarEventRequest,
 	CalendarProvider,
-	DeleteCalendarEventRequest,
-	Provider,
-	CalendarSubscriptionRequest
+	CalendarSubscriptionRequest,
+	CalendarEventIdentifier,
+	ListCalendarEventsQuery
 } from './types';
 import { error } from '@sveltejs/kit';
 
 // ==== HELPER
 const getCalendarProvider = (provider: Provider): CalendarProvider => {
-	if (provider === 'google') return provider;
+	if (provider === 'google') return googleProvider;
 	else error(500, `Unsupported provider: "${provider}".`);
 };
 
@@ -53,9 +51,7 @@ const subscribeCalendarChanges = async (params: CalendarSubscriptionRequest) => 
 	return provider.calendars.subscribeToChanges(params, auth);
 };
 
-const retrieveCalendarEvent = async (
-	params: RetrieveCalendarEventRequest
-): Promise<CalendarEvent> => {
+const retrieveCalendarEvent = async (params: CalendarEventIdentifier): Promise<CalendarEvent> => {
 	const account = await getOrThrowAcount(params.accountId);
 	const auth = await getAuthForAccount(account);
 	const provider = getCalendarProvider(account.provider as Provider);
@@ -76,11 +72,18 @@ const updateCalendarEvent = async (event: CalendarEvent) => {
 	return provider.events.update(event, auth);
 };
 
-const deleteCalendarEvent = async (params: DeleteCalendarEventRequest & { accountId: string }) => {
+const deleteCalendarEvent = async (params: CalendarEventIdentifier & { accountId: string }) => {
 	const account = await getOrThrowAcount(params.accountId);
 	const auth = await getAuthForAccount(account);
 	const provider = getCalendarProvider(account.provider as Provider);
-	return await provider.events.update(params, auth);
+	return await provider.events.delete(params, auth);
+};
+
+const listCalendarEvents = async (query: ListCalendarEventsQuery) => {
+	const account = await getOrThrowAcount(query.accountId);
+	const auth = await getAuthForAccount(account);
+	const provider = getCalendarProvider(account.provider as Provider);
+	return provider.events.list(query, auth);
 };
 
 export const calendarProvider = {
@@ -89,6 +92,7 @@ export const calendarProvider = {
 		subscribe: subscribeCalendarChanges
 	},
 	events: {
+		list: listCalendarEvents,
 		create: createCalendarEvent,
 		update: updateCalendarEvent,
 		delete: deleteCalendarEvent,

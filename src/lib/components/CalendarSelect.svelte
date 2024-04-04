@@ -20,6 +20,7 @@
 	export let selected = accounts[0]?.calendars[0];
 
 	let isOpen = false;
+	let ignoreBlur = false;
 	let accountIdInputElement: HTMLInputElement;
 	let calendarIdInputElement: HTMLInputElement;
 
@@ -31,16 +32,29 @@
 		{} as { [key: string]: Account }
 	);
 
-	function toggleDropdown() {
-		isOpen = !isOpen;
-	}
-
-	function selectOption(option: any) {
+	const selectOption = (option: any) => {
 		selected = option;
-		isOpen = false;
 		accountIdInputElement.value = calendarAccountMap[option.id].id;
 		calendarIdInputElement.value = option.id;
-	}
+		isOpen = false;
+	};
+
+	const onFocus = (e: FocusEvent) => {
+		ignoreBlur = false;
+		isOpen = true;
+	};
+
+	const onBlur = (e: FocusEvent) => {
+		if (ignoreBlur) return;
+		isOpen = false;
+	};
+
+	const onKeyDown = (e: KeyboardEvent) => {
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			e.preventDefault();
+			isOpen = true;
+		}
+	};
 
 	onMount(() => {
 		accountIdInputElement.value = calendarAccountMap[selected?.id]?.id;
@@ -51,14 +65,18 @@
 <div class="relative mt-2">
 	<input type="hidden" bind:this={accountIdInputElement} name={`${name}.accountId`} />
 	<input type="hidden" bind:this={calendarIdInputElement} name={`${name}.calendarId`} />
-	<button
+	<div
 		{id}
-		on:click={toggleDropdown}
-		type="button"
+		on:focus={onFocus}
+		on:blur={onBlur}
+		on:keydown={onKeyDown}
 		class="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
+		role="combobox"
 		aria-haspopup="listbox"
 		aria-labelledby="listbox-label"
 		aria-expanded={isOpen}
+		aria-controls="listbox"
+		tabindex="0"
 	>
 		<span class="inline-flex w-full items-center gap-x-2 truncate">
 			{#if selected}
@@ -81,7 +99,7 @@
 				/>
 			</svg>
 		</span>
-	</button>
+	</div>
 
 	{#if isOpen}
 		<ul
@@ -92,8 +110,10 @@
 			aria-activedescendant="listbox-option-3"
 		>
 			{#each accounts as account}
+				<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 				<li
 					class="text-gray-500 truncate pl-3 pr-9 py-2 font-semibold inline-flex gap-x-2 items-center mt-2"
+					on:mousedown={() => (ignoreBlur = true)}
 				>
 					<svelte:component this={account.providerIcon} />
 					{account.email}
@@ -103,6 +123,7 @@
 					<li
 						on:click={() => selectOption(calendar)}
 						on:keydown={() => {}}
+						on:mousedown={() => (ignoreBlur = true)}
 						role="option"
 						aria-selected={selected.id === calendar.id}
 						class="text-gray-900 cursor-pointer relative select-none py-2 pl-3 pr-9 hover:bg-slate-50"

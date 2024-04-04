@@ -38,7 +38,7 @@
 				<CalendarSelect id="target-calendar" {accounts} name={'targetCalendar'} />
 			</formgroup>
 			{#if form}<span class="font-red">{form?.message}</span>{/if}
-			<Button>Abschließen</Button>
+			<Button type="submit">Abschließen</Button>
 		</form>
 	</div>
 </div>

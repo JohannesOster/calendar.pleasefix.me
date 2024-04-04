@@ -1,10 +1,11 @@
 const _config = {
 	development: {
 		google: {
-			clientID: '814682511130-he9mlhc4f1pprkkm4th426fto2o7fc32.apps.googleusercontent.com',
+			clientID: '814682511130-0o478o4iv077dfrbnc5aatbvfjll3a3b.apps.googleusercontent.com',
 			clientSecret: '',
 			authCallbackURL: 'http://localhost:5173/api/auth/google/callback'
 		},
+		redis: { host: 'localhost', port: 6379 },
 		sessionEnryptionKey: '',
 		baseURL: 'http://localhost:5173'
 	},
@@ -14,6 +15,7 @@ const _config = {
 			clientSecret: '',
 			authCallbackURL: 'https://pleasefix.me/api/auth/google/callback'
 		},
+		redis: { host: 'localhost', port: 6379 },
 		sessionEnryptionKey: '',
 		baseURL: 'http://pleasefix.me'
 	}
