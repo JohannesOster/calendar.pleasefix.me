@@ -81,7 +81,8 @@ jobs:
             prisma migrate deploy
 
             # Reload PM2 process with new environment variables
-            env $(cat .env | grep -v "^#" | xargs) sh -c 'pm2 reload ../ecosystem.config.js --env production --update-env'
+            cd ..
+            env $(cat current/.env | grep -v "^#" | xargs) sh -c 'pm2 reload ecosystem.config.js --env production --update-env'
 
             # Cleanup temporary .env file
             # rm .env
