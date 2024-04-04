@@ -1,15 +1,15 @@
-import { google } from 'googleapis';
 import { loadConfig } from '$lib/config';
 import { error, type Cookies } from '@sveltejs/kit';
+import { OAuth2Client } from 'google-auth-library';
 
 const { google: googleConfig } = await loadConfig();
 
 export const getGoogleOAuth2Client = () => {
-	return new google.auth.OAuth2(
-		googleConfig.clientID,
-		googleConfig.clientSecret,
-		googleConfig.authCallbackURL
-	);
+	return new OAuth2Client({
+		clientId: googleConfig.clientID,
+		clientSecret: googleConfig.clientSecret,
+		redirectUri: googleConfig.authCallbackURL
+	});
 };
 
 type TokenValidationRequestParams = { formData: FormData; cookies: Cookies };
