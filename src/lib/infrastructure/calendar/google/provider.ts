@@ -79,8 +79,7 @@ const subscribeToCalendarChanges = async (
 			resourceId: resp.data.resourceId,
 			accountId,
 			calendarId,
-			nextSyncToken,
-			expiration
+			nextSyncToken
 		}
 	});
 

@@ -33,7 +33,6 @@ model SyncChannel {
   calendarId    String
   nextSyncToken String?
   resourceId    String?
-  expiration    DateTime?
 }
 
 model SyncRule {
